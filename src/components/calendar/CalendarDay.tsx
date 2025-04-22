@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
@@ -27,35 +26,59 @@ export const CalendarDay = ({ day, isMobile, calendarType }: CalendarDayProps) =
     return <div className="day-cell empty" />;
   }
 
-  // Create separate component for day content to avoid ref forwarding issues
   const dayContent = (
     <div 
       className={cn(
         "day-cell group hover:bg-muted/50 transition-colors duration-200",
         day.isToday && "today-cell",
-        "flex flex-col items-center justify-center p-1 md:p-2",
-        "w-full h-full cursor-pointer"
+        "flex flex-col items-center justify-center p-2 md:p-3",
+        "w-full h-full cursor-pointer gap-1 md:gap-2"
       )}
     >
       <div className={cn(
-        "day-number font-medium",
+        "day-number font-medium text-sm md:text-base",
         day.isToday && "text-primary"
       )}>
         {day.date}
       </div>
+      
       {calendarType === "numerology" ? (
-        <div className="numerology-value text-muted-foreground group-hover:text-foreground transition-colors">
-          <span className={cn(
-            "master-number",
-            [11, 22, 33].includes(day.primaryNumber) && "text-accent font-semibold"
-          )}>
-            {day.primaryNumber}
-          </span>
+        <div className="flex flex-col items-center space-y-0.5">
+          <div className="numerology-value text-muted-foreground group-hover:text-foreground transition-colors">
+            <span className={cn(
+              "master-number",
+              [11, 22, 33].includes(day.primaryNumber) && "text-accent font-semibold"
+            )}>
+              {day.primaryNumber}
+            </span>
+          </div>
+          {!isMobile && day.secondaryNumber && (
+            <div className="hidden md:block text-xs text-muted-foreground group-hover:text-foreground">
+              ({day.secondaryNumber})
+            </div>
+          )}
+          {!isMobile && day.personalNumber && (
+            <div className="hidden md:block text-xs text-primary/70 font-medium">
+              Personal: {day.personalNumber}
+            </div>
+          )}
         </div>
       ) : (
-        <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-          {day.zodiacSign?.substring(0, 3)}
-        </span>
+        <div className="flex flex-col items-center space-y-0.5">
+          <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+            {day.zodiacSign?.substring(0, 3)}
+          </span>
+          {!isMobile && (
+            <>
+              <span className="hidden md:block text-xs text-muted-foreground/80">
+                {day.chineseSign}
+              </span>
+              <span className="hidden md:block text-xs text-primary/70">
+                {day.planetaryInfluence}
+              </span>
+            </>
+          )}
+        </div>
       )}
     </div>
   );
@@ -69,7 +92,6 @@ export const CalendarDay = ({ day, isMobile, calendarType }: CalendarDayProps) =
         <DrawerContent>
           <div className="px-4 pb-6 pt-2">
             <DayDetail day={day} calendarType={calendarType} onClose={close => {
-              // Find the close button in the drawer and click it
               const closeButton = document.querySelector('[data-vaul-drawer-close]');
               if (closeButton) {
                 (closeButton as HTMLElement).click();
@@ -91,7 +113,6 @@ export const CalendarDay = ({ day, isMobile, calendarType }: CalendarDayProps) =
           <DialogTitle>Day Details</DialogTitle>
         </DialogHeader>
         <DayDetail day={day} calendarType={calendarType} onClose={close => {
-          // Find the close button in the dialog and click it
           const closeButton = document.querySelector('[data-radix-collection-item]');
           if (closeButton) {
             (closeButton as HTMLElement).click();
