@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Star, Planet, CalendarDays } from "lucide-react";
+import { MessageCircle, Star, Plane, CalendarDays } from "lucide-react";
 
 interface DayData {
   date: number;
@@ -67,7 +67,7 @@ export const DayDetail = ({ day, calendarType, onClose }: DayDetailProps) => {
         <div className="space-y-4">
           <div className="p-4 rounded-lg border bg-card/50 backdrop-blur-sm">
             <h3 className="text-lg font-medium mb-3 flex items-center">
-              <Planet className="h-5 w-5 mr-2 text-primary" />
+              <Plane className="h-5 w-5 mr-2 text-primary" />
               Astrological Influences
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
