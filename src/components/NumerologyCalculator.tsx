@@ -1,120 +1,176 @@
 
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
+import React, { useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Calendar } from "lucide-react";
 
 interface NumerologyCalculatorProps {
   onCalculate: (lifePathNumber: number) => void;
+  compact?: boolean;
 }
 
-export const NumerologyCalculator = ({ onCalculate }: NumerologyCalculatorProps) => {
+export const NumerologyCalculator = ({ onCalculate, compact = false }: NumerologyCalculatorProps) => {
   const [birthdate, setBirthdate] = useState("");
-  const [manualNumber, setManualNumber] = useState("");
-  const [displayedNumber, setDisplayedNumber] = useState<string>("N/A");
+  const [result, setResult] = useState<number | null>(null);
+  const [error, setError] = useState("");
 
-  const calculateLifePath = (date: string) => {
-    const cleaned = date.replace(/\D/g, "");
-    if (cleaned.length !== 8) return null;
+  const masterNumbers = [11, 22, 33];
 
-    const day = parseInt(cleaned.substring(0, 2));
-    const month = parseInt(cleaned.substring(2, 4));
-    const year = parseInt(cleaned.substring(4));
+  const calculateLifePath = () => {
+    setError("");
+    
+    if (!birthdate) {
+      setError("Please enter your birthdate");
+      return;
+    }
+    
+    // Remove non-digits and check format
+    const cleanBirthdate = birthdate.replace(/\D/g, "");
+    if (cleanBirthdate.length !== 8) {
+      setError("Please enter a valid date in format DD/MM/YYYY");
+      return;
+    }
 
-    if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+    // Parse date components
+    const day = parseInt(cleanBirthdate.substring(0, 2));
+    const month = parseInt(cleanBirthdate.substring(2, 4));
+    const year = parseInt(cleanBirthdate.substring(4));
 
-    const sumDigits = (num: number) => {
-      return num.toString().split("").reduce((acc, val) => acc + parseInt(val), 0);
-    };
-
+    // Validate date components
+    if (month < 1 || month > 12) {
+      setError("Month must be between 1 and 12");
+      return;
+    }
+    if (day < 1 || day > 31) {
+      setError("Day must be between 1 and 31");
+      return;
+    }
+    
+    // Calculate life path number
     const daySum = sumDigits(day);
     const monthSum = sumDigits(month);
     const yearSum = sumDigits(year);
     
     let total = daySum + monthSum + yearSum;
     
-    // Reduce to single digit unless it's a master number
-    while (total > 9 && ![11, 22, 33].includes(total)) {
-      total = sumDigits(total);
+    // Reduce the number unless it's a master number
+    let lifePathNumber;
+    if (masterNumbers.includes(total)) {
+      lifePathNumber = total;
+    } else {
+      lifePathNumber = reduceToSingleDigit(total);
     }
     
-    return total;
+    setResult(lifePathNumber);
+    onCalculate(lifePathNumber);
   };
 
-  const handleCalculate = () => {
-    const number = calculateLifePath(birthdate);
-    if (number) {
-      setDisplayedNumber(number.toString());
-      onCalculate(number);
-    }
+  const sumDigits = (num: number): number => {
+    return num.toString().split("").reduce((acc, digit) => acc + parseInt(digit), 0);
   };
 
-  const handleManualInput = (value: string) => {
-    setManualNumber(value);
-    const num = parseInt(value);
-    if (!isNaN(num) && num > 0) {
-      setDisplayedNumber(num.toString());
-      onCalculate(num);
+  const reduceToSingleDigit = (num: number): number => {
+    while (num > 9) {
+      if (masterNumbers.includes(num)) {
+        return num;
+      }
+      num = sumDigits(num);
     }
+    return num;
   };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    
+    // Auto-format the date as DD/MM/YYYY while typing
+    let formatted = value.replace(/\D/g, "");
+    
+    if (formatted.length > 0) {
+      if (formatted.length <= 2) {
+        formatted = formatted;
+      } else if (formatted.length <= 4) {
+        formatted = `${formatted.substring(0, 2)}/${formatted.substring(2)}`;
+      } else {
+        formatted = `${formatted.substring(0, 2)}/${formatted.substring(2, 4)}/${formatted.substring(4, 8)}`;
+      }
+    }
+    
+    setBirthdate(formatted);
+    setError("");
+  };
+
+  if (compact) {
+    return (
+      <div className="space-y-2">
+        <div className="flex gap-2">
+          <Input
+            type="text"
+            value={birthdate}
+            onChange={handleInputChange}
+            placeholder="DD/MM/YYYY"
+            className="text-sm"
+          />
+          <Button size="sm" onClick={calculateLifePath}>Calculate</Button>
+        </div>
+        {result !== null && (
+          <div className="bg-primary/10 text-center p-2 rounded-md">
+            <span className="text-sm font-medium">
+              Life Path Number: <span className={masterNumbers.includes(result) ? "text-accent font-bold" : ""}>{result}</span>
+            </span>
+          </div>
+        )}
+        {error && <p className="text-destructive text-xs">{error}</p>}
+      </div>
+    );
+  }
 
   return (
-    <Card className="w-full max-w-lg mx-auto shadow-lg">
+    <Card className="shadow-md animate-fade-in">
       <CardHeader>
-        <CardTitle className="text-2xl md:text-3xl text-center font-display">
-          Calculate Your Life Path
+        <CardTitle className="flex items-center gap-2 text-2xl font-display">
+          <Calendar className="h-6 w-6 text-primary" />
+          <span>Calculate Your Life Path Number</span>
         </CardTitle>
+        <CardDescription>
+          Enter your birthdate to discover your life path number and see how it influences each day
+        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-8">
+      <CardContent>
         <div className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">
-              Enter your birthdate (DDMMYYYY)
-            </label>
-            <div className="flex gap-3">
-              <Input
-                placeholder="DDMMYYYY"
-                value={birthdate}
-                onChange={(e) => setBirthdate(e.target.value)}
-                maxLength={8}
-                className="flex-1"
-              />
-              <Button onClick={handleCalculate} className="shrink-0">
-                Calculate
+            <Label htmlFor="birthdate">Your Birthdate</Label>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1">
+                <Input
+                  id="birthdate"
+                  type="text"
+                  value={birthdate}
+                  onChange={handleInputChange}
+                  placeholder="DD/MM/YYYY"
+                />
+                {error && <p className="text-destructive text-sm mt-1">{error}</p>}
+              </div>
+              <Button onClick={calculateLifePath} className="w-full sm:w-auto">
+                Calculate Life Path
               </Button>
             </div>
           </div>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
+          
+          {result !== null && (
+            <div className="bg-primary/10 p-4 rounded-lg text-center animate-fade-in transition-all">
+              <p className="text-sm text-muted-foreground">Your Life Path Number</p>
+              <p className={`text-4xl font-bold mt-1 ${masterNumbers.includes(result) ? "text-accent" : ""}`}>
+                {result}
+              </p>
+              <p className="mt-2 text-sm">
+                {masterNumbers.includes(result) ? 
+                  "This is a Master Number with special significance!" : 
+                  "This number represents your life's purpose and journey."}
+              </p>
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">or</span>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">
-              Enter Life Path Number directly
-            </label>
-            <Input
-              type="number"
-              placeholder="1-99"
-              value={manualNumber}
-              onChange={(e) => handleManualInput(e.target.value)}
-              min={1}
-              max={99}
-            />
-          </div>
-        </div>
-
-        <div className="pt-4 text-center space-y-2">
-          <p className="text-sm text-muted-foreground">Your Life Path Number</p>
-          <p className={`text-3xl font-bold ${[11, 22, 33].includes(parseInt(displayedNumber)) ? "text-accent" : ""}`}>
-            {displayedNumber}
-          </p>
+          )}
         </div>
       </CardContent>
     </Card>

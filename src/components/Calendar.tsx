@@ -1,9 +1,12 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Star } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface DayData {
   date: number;
@@ -11,18 +14,28 @@ interface DayData {
   secondaryNumber?: number;
   personalNumber?: number;
   isToday: boolean;
+  // Added fields
+  zodiacSign?: string;
+  chineseSign?: string;
+  planetaryInfluence?: string;
 }
 
 interface CalendarProps {
   lifePathNumber: number | null;
+  calendarType?: "numerology" | "astrology";
 }
 
-export const Calendar = ({ lifePathNumber }: CalendarProps) => {
+export const Calendar = ({ lifePathNumber, calendarType = "numerology" }: CalendarProps) => {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const isMobile = useIsMobile();
+  
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   const masterNumbers = [11, 22, 33];
+  const zodiacSigns = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+  const chineseSigns = ["Rat", "Ox", "Tiger", "Rabbit", "Dragon", "Snake", "Horse", "Goat", "Monkey", "Rooster", "Dog", "Pig"];
+  const planets = ["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"];
 
   const calculateDayNumerology = (date: number, month: number, year: number) => {
     const sumDigits = (num: number) => {
@@ -46,7 +59,25 @@ export const Calendar = ({ lifePathNumber }: CalendarProps) => {
         sumDigits(personalTotal);
     }
 
-    return { primaryNumber, secondaryNumber, personalNumber };
+    // Calculate extra astrological data
+    const dayOfYear = Math.floor((new Date(year, month, date).getTime() - new Date(year, 0, 0).getTime()) / (24 * 60 * 60 * 1000));
+    const zodiacIndex = Math.floor((dayOfYear - 80) / 30) % 12;
+    const zodiacSign = zodiacSigns[zodiacIndex >= 0 ? zodiacIndex : zodiacIndex + 12];
+    
+    const chineseIndex = (year - 1900) % 12;
+    const chineseSign = chineseSigns[chineseIndex >= 0 ? chineseIndex : chineseIndex + 12];
+    
+    const planetIndex = (dayOfYear + date) % planets.length;
+    const planetaryInfluence = planets[planetIndex];
+
+    return { 
+      primaryNumber, 
+      secondaryNumber, 
+      personalNumber,
+      zodiacSign,
+      chineseSign,
+      planetaryInfluence
+    };
   };
 
   const generateCalendarDays = (): DayData[] => {
@@ -65,7 +96,15 @@ export const Calendar = ({ lifePathNumber }: CalendarProps) => {
     
     // Add actual days
     for (let date = 1; date <= daysInMonth; date++) {
-      const { primaryNumber, secondaryNumber, personalNumber } = calculateDayNumerology(date, month, year);
+      const { 
+        primaryNumber, 
+        secondaryNumber, 
+        personalNumber,
+        zodiacSign,
+        chineseSign,
+        planetaryInfluence
+      } = calculateDayNumerology(date, month, year);
+      
       const isToday = date === today.getDate() && 
                       month === today.getMonth() && 
                       year === today.getFullYear();
@@ -75,7 +114,10 @@ export const Calendar = ({ lifePathNumber }: CalendarProps) => {
         primaryNumber,
         secondaryNumber,
         personalNumber,
-        isToday
+        isToday,
+        zodiacSign,
+        chineseSign,
+        planetaryInfluence
       });
     }
     
@@ -103,14 +145,100 @@ export const Calendar = ({ lifePathNumber }: CalendarProps) => {
 
   const personalMonthNumerology = lifePathNumber ? masterNumbers.includes(monthNumerology + lifePathNumber) ? monthNumerology + lifePathNumber : (monthNumerology + lifePathNumber).toString().split("").reduce((acc, val) => acc + parseInt(val), 0) : null;
 
+  // Day detail component - will be used in both Dialog and Drawer
+  const DayDetail = ({ 
+    day, 
+    onClose 
+  }: { 
+    day: DayData, 
+    onClose?: () => void 
+  }) => (
+    <div className="space-y-4 py-2">
+      <div className="text-center sm:text-left mb-4">
+        <h2 className="text-xl font-semibold">
+          {monthNames[currentDate.getMonth()]} {day.date}, {currentDate.getFullYear()}
+          {day.isToday && <span className="ml-2 text-primary">(Today)</span>}
+        </h2>
+      </div>
+
+      {calendarType === "numerology" ? (
+        <div className="space-y-4">
+          <div className="p-3 rounded-lg border bg-card">
+            <h3 className="text-lg font-medium mb-1 flex items-center">
+              Numerology
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+              <div className="p-2 bg-muted/50 rounded">
+                <div className="text-muted-foreground">Primary Number</div>
+                <div className="text-base font-semibold mt-1">
+                  {masterNumbers.includes(day.primaryNumber) ? 
+                    <span className="text-accent">{day.primaryNumber}</span> : day.primaryNumber}
+                </div>
+              </div>
+              
+              {day.secondaryNumber && (
+                <div className="p-2 bg-muted/50 rounded">
+                  <div className="text-muted-foreground">Secondary Number</div>
+                  <div className="text-base font-semibold mt-1">
+                    {masterNumbers.includes(day.secondaryNumber) ? 
+                      <span className="text-accent">{day.secondaryNumber}</span> : day.secondaryNumber}
+                  </div>
+                </div>
+              )}
+              
+              {day.personalNumber && (
+                <div className="p-2 bg-muted/50 rounded sm:col-span-2">
+                  <div className="text-muted-foreground">Personal Number</div>
+                  <div className="text-base font-semibold mt-1">
+                    {masterNumbers.includes(day.personalNumber) ? 
+                      <span className="text-accent">{day.personalNumber}</span> : day.personalNumber}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <div className="p-3 rounded-lg border bg-card">
+            <h3 className="text-lg font-medium mb-1 flex items-center">
+              <Star className="h-5 w-5 mr-1 text-primary" />
+              Astrological Influences
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+              <div className="p-2 bg-muted/50 rounded">
+                <div className="text-muted-foreground">Zodiac Sign</div>
+                <div className="text-base font-semibold mt-1">{day.zodiacSign}</div>
+              </div>
+              <div className="p-2 bg-muted/50 rounded">
+                <div className="text-muted-foreground">Chinese Sign</div>
+                <div className="text-base font-semibold mt-1">{day.chineseSign}</div>
+              </div>
+              <div className="p-2 bg-muted/50 rounded sm:col-span-2">
+                <div className="text-muted-foreground">Planetary Influence</div>
+                <div className="text-base font-semibold mt-1">{day.planetaryInfluence}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {onClose && (
+        <div className="mt-4 flex justify-end">
+          <Button onClick={onClose}>Close</Button>
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <Card className="w-full shadow-lg">
-      <CardHeader className="space-y-6">
-        <div className="flex items-center justify-between gap-4">
+      <CardHeader className="space-y-4">
+        <div className="flex items-center justify-between gap-2">
           <Button variant="outline" size="icon" onClick={previousMonth}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <CardTitle className="text-2xl md:text-3xl lg:text-4xl font-display">
+          <CardTitle className="text-xl md:text-3xl font-display">
             {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
           </CardTitle>
           <Button variant="outline" size="icon" onClick={nextMonth}>
@@ -118,89 +246,126 @@ export const Calendar = ({ lifePathNumber }: CalendarProps) => {
           </Button>
         </div>
         <div className="flex flex-wrap justify-center gap-4 text-sm md:text-base text-muted-foreground">
-          <p>Month Numerology: <span className="font-semibold text-foreground">{monthNumerology}</span></p>
-          {lifePathNumber && (
-            <p>Personal Month: <span className="font-semibold text-foreground">{personalMonthNumerology}</span></p>
+          {calendarType === "numerology" && (
+            <>
+              <div className="px-2 py-1 bg-primary/10 rounded-md">
+                Month Number: <span className="font-semibold text-foreground">{monthNumerology}</span>
+              </div>
+              {lifePathNumber && (
+                <div className="px-2 py-1 bg-accent/10 rounded-md">
+                  Personal Month: <span className="font-semibold text-foreground">{personalMonthNumerology}</span>
+                </div>
+              )}
+            </>
+          )}
+          {calendarType === "astrology" && (
+            <div className="px-2 py-1 bg-primary/10 rounded-md">
+              <span className="font-semibold text-foreground">{zodiacSigns[currentDate.getMonth() % 12]}</span> Season
+            </div>
           )}
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="calendar-grid mb-4">
+      <CardContent className="pb-6">
+        <div className="grid grid-cols-7 mb-2">
           {dayNames.map((day) => (
-            <div key={day} className="font-medium text-center text-sm text-muted-foreground p-2">
+            <div key={day} className="font-medium text-center text-xs sm:text-sm text-muted-foreground p-1">
               {day}
             </div>
           ))}
         </div>
-        <div className="calendar-grid">
+        <div className="grid grid-cols-7 gap-1 sm:gap-2">
           {generateCalendarDays().map((day, index) => (
             day.date === 0 ? (
-              <div key={index} />
+              <div key={index} className="aspect-square" />
+            ) : isMobile ? (
+              <Drawer key={index}>
+                <DrawerTrigger asChild>
+                  <div 
+                    className={`relative aspect-square flex flex-col p-1 rounded-md border cursor-pointer hover:bg-accent/5 transition-colors ${
+                      day.isToday ? "ring-1 ring-primary" : ""
+                    }`}
+                  >
+                    <div className="text-right text-xs font-medium">{day.date}</div>
+                    <div className="mt-auto">
+                      {calendarType === "numerology" ? (
+                        <div className="w-full flex justify-center">
+                          <div className={`text-xs font-medium ${masterNumbers.includes(day.primaryNumber) ? "text-accent" : ""}`}>
+                            {day.primaryNumber}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="w-full flex justify-center text-xs text-muted-foreground">
+                          {day.zodiacSign?.substring(0, 3)}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </DrawerTrigger>
+                <DrawerContent>
+                  <div className="px-4 pb-6 pt-2 max-w-md mx-auto">
+                    <DayDetail day={day} />
+                  </div>
+                </DrawerContent>
+              </Drawer>
             ) : (
               <Dialog key={index}>
                 <DialogTrigger asChild>
                   <div 
-                    className={`day-cell cursor-pointer hover:bg-accent/5 ${
-                      day.isToday ? "ring-2 ring-primary ring-offset-2" : ""
+                    className={`relative aspect-square flex flex-col p-2 rounded-md border cursor-pointer hover:bg-accent/5 transition-colors ${
+                      day.isToday ? "ring-1 ring-primary" : ""
                     }`}
                   >
-                    <div className="text-right text-sm font-medium mb-2">{day.date}</div>
-                    <div className="numerology-display">
-                      <div>
-                        <span className="numerology-label">Primary:</span>{" "}
-                        <span className={[11, 22, 33].includes(day.primaryNumber) ? "master-number" : ""}>
-                          {day.primaryNumber}
-                        </span>
-                      </div>
-                      {day.secondaryNumber && (
-                        <div>
-                          <span className="numerology-label">Secondary:</span>{" "}
-                          <span className={[11, 22, 33].includes(day.secondaryNumber) ? "master-number" : ""}>
-                            {day.secondaryNumber}
-                          </span>
-                        </div>
-                      )}
-                      {day.personalNumber && (
-                        <div>
-                          <span className="numerology-label">Personal:</span>{" "}
-                          <span className={[11, 22, 33].includes(day.personalNumber) ? "master-number" : ""}>
-                            {day.personalNumber}
-                          </span>
-                        </div>
+                    <div className="text-right text-sm font-medium">{day.date}</div>
+                    <div className="flex-1 flex flex-col justify-center text-xs space-y-0.5 pt-1">
+                      {calendarType === "numerology" ? (
+                        <>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Primary:</span>
+                            <span className={masterNumbers.includes(day.primaryNumber) ? "text-accent" : ""}>
+                              {day.primaryNumber}
+                            </span>
+                          </div>
+                          {day.secondaryNumber && (
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Secondary:</span>
+                              <span className={masterNumbers.includes(day.secondaryNumber) ? "text-accent" : ""}>
+                                {day.secondaryNumber}
+                              </span>
+                            </div>
+                          )}
+                          {day.personalNumber && (
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Personal:</span>
+                              <span className={masterNumbers.includes(day.personalNumber) ? "text-accent" : ""}>
+                                {day.personalNumber}
+                              </span>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Zodiac:</span>
+                            <span>{day.zodiacSign?.substring(0, 3)}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Chinese:</span>
+                            <span>{day.chineseSign?.substring(0, 3)}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Planet:</span>
+                            <span>{day.planetaryInfluence?.substring(0, 3)}</span>
+                          </div>
+                        </>
                       )}
                     </div>
                   </div>
                 </DialogTrigger>
                 <DialogContent className="max-w-md">
                   <DialogHeader>
-                    <DialogTitle className="font-display text-xl">
-                      {monthNames[currentDate.getMonth()]} {day.date}, {currentDate.getFullYear()}
-                    </DialogTitle>
+                    <DialogTitle className="font-display text-xl">Day Details</DialogTitle>
                   </DialogHeader>
-                  <div className="space-y-4">
-                    <div>
-                      <h3 className="font-semibold mb-2">Primary Number: {day.primaryNumber}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Represents core energy and main theme for the day
-                      </p>
-                    </div>
-                    {day.secondaryNumber && (
-                      <div>
-                        <h3 className="font-semibold mb-2">Secondary Number: {day.secondaryNumber}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Reveals underlying influences and supporting energies
-                        </p>
-                      </div>
-                    )}
-                    {day.personalNumber && (
-                      <div>
-                        <h3 className="font-semibold mb-2">Personal Number: {day.personalNumber}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Shows how this day's energy interacts with your life path
-                        </p>
-                      </div>
-                    )}
-                  </div>
+                  <DayDetail day={day} />
                 </DialogContent>
               </Dialog>
             )
