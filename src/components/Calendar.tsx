@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -100,19 +99,29 @@ export const Calendar = ({ lifePathNumber }: CalendarProps) => {
     );
   };
 
+  const monthNumerology = masterNumbers.includes(currentDate.getMonth() + 1) ? currentDate.getMonth() + 1 : (currentDate.getMonth() + 1).toString().split("").reduce((acc, val) => acc + parseInt(val), 0);
+
+  const personalMonthNumerology = lifePathNumber ? masterNumbers.includes(monthNumerology + lifePathNumber) ? monthNumerology + lifePathNumber : (monthNumerology + lifePathNumber).toString().split("").reduce((acc, val) => acc + parseInt(val), 0) : null;
+
   return (
-    <Card className="w-full max-w-[1200px] mx-auto">
-      <CardHeader className="space-y-4">
+    <Card className="w-full shadow-lg">
+      <CardHeader className="space-y-6">
         <div className="flex items-center justify-between gap-4">
           <Button variant="outline" size="icon" onClick={previousMonth}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <CardTitle className="text-2xl sm:text-3xl font-display">
+          <CardTitle className="text-2xl md:text-3xl lg:text-4xl font-display">
             {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
           </CardTitle>
           <Button variant="outline" size="icon" onClick={nextMonth}>
             <ChevronRight className="h-4 w-4" />
           </Button>
+        </div>
+        <div className="flex flex-wrap justify-center gap-4 text-sm md:text-base text-muted-foreground">
+          <p>Month Numerology: <span className="font-semibold text-foreground">{monthNumerology}</span></p>
+          {lifePathNumber && (
+            <p>Personal Month: <span className="font-semibold text-foreground">{personalMonthNumerology}</span></p>
+          )}
         </div>
       </CardHeader>
       <CardContent>
@@ -130,44 +139,54 @@ export const Calendar = ({ lifePathNumber }: CalendarProps) => {
             ) : (
               <Dialog key={index}>
                 <DialogTrigger asChild>
-                  <div className={`day-cell cursor-pointer ${day.isToday ? "today-cell" : ""}`}>
+                  <div 
+                    className={`day-cell cursor-pointer hover:bg-accent/5 ${
+                      day.isToday ? "ring-2 ring-primary ring-offset-2" : ""
+                    }`}
+                  >
                     <div className="text-right text-sm font-medium mb-2">{day.date}</div>
                     <div className="numerology-display">
                       <div>
                         <span className="numerology-label">Primary:</span>{" "}
-                        {formatNumberWithMasterNumber(day.primaryNumber)}
+                        <span className={[11, 22, 33].includes(day.primaryNumber) ? "master-number" : ""}>
+                          {day.primaryNumber}
+                        </span>
                       </div>
                       {day.secondaryNumber && (
                         <div>
                           <span className="numerology-label">Secondary:</span>{" "}
-                          {formatNumberWithMasterNumber(day.secondaryNumber)}
+                          <span className={[11, 22, 33].includes(day.secondaryNumber) ? "master-number" : ""}>
+                            {day.secondaryNumber}
+                          </span>
                         </div>
                       )}
                       {day.personalNumber && (
                         <div>
                           <span className="numerology-label">Personal:</span>{" "}
-                          {formatNumberWithMasterNumber(day.personalNumber)}
+                          <span className={[11, 22, 33].includes(day.personalNumber) ? "master-number" : ""}>
+                            {day.personalNumber}
+                          </span>
                         </div>
                       )}
                     </div>
                   </div>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="max-w-md">
                   <DialogHeader>
-                    <DialogTitle>
+                    <DialogTitle className="font-display text-xl">
                       {monthNames[currentDate.getMonth()]} {day.date}, {currentDate.getFullYear()}
                     </DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
-                      <h3 className="font-semibold mb-2">Primary Number: {formatNumberWithMasterNumber(day.primaryNumber)}</h3>
+                      <h3 className="font-semibold mb-2">Primary Number: {day.primaryNumber}</h3>
                       <p className="text-sm text-muted-foreground">
                         Represents core energy and main theme for the day
                       </p>
                     </div>
                     {day.secondaryNumber && (
                       <div>
-                        <h3 className="font-semibold mb-2">Secondary Number: {formatNumberWithMasterNumber(day.secondaryNumber)}</h3>
+                        <h3 className="font-semibold mb-2">Secondary Number: {day.secondaryNumber}</h3>
                         <p className="text-sm text-muted-foreground">
                           Reveals underlying influences and supporting energies
                         </p>
@@ -175,7 +194,7 @@ export const Calendar = ({ lifePathNumber }: CalendarProps) => {
                     )}
                     {day.personalNumber && (
                       <div>
-                        <h3 className="font-semibold mb-2">Personal Number: {formatNumberWithMasterNumber(day.personalNumber)}</h3>
+                        <h3 className="font-semibold mb-2">Personal Number: {day.personalNumber}</h3>
                         <p className="text-sm text-muted-foreground">
                           Shows how this day's energy interacts with your life path
                         </p>

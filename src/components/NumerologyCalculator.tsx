@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 interface NumerologyCalculatorProps {
   onCalculate: (lifePathNumber: number) => void;
@@ -59,15 +60,19 @@ export const NumerologyCalculator = ({ onCalculate }: NumerologyCalculatorProps)
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto mb-8">
+    <Card className="w-full max-w-lg mx-auto shadow-lg">
       <CardHeader>
-        <CardTitle className="text-2xl text-center font-display">Calculate Your Life Path</CardTitle>
+        <CardTitle className="text-2xl md:text-3xl text-center font-display">
+          Calculate Your Life Path
+        </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-8">
         <div className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Your Birthdate (DDMMYYYY)</label>
-            <div className="flex gap-2">
+            <label className="text-sm font-medium text-muted-foreground">
+              Enter your birthdate (DDMMYYYY)
+            </label>
+            <div className="flex gap-3">
               <Input
                 placeholder="DDMMYYYY"
                 value={birthdate}
@@ -75,19 +80,25 @@ export const NumerologyCalculator = ({ onCalculate }: NumerologyCalculatorProps)
                 maxLength={8}
                 className="flex-1"
               />
-              <Button onClick={handleCalculate}>Calculate</Button>
+              <Button onClick={handleCalculate} className="shrink-0">
+                Calculate
+              </Button>
             </div>
           </div>
+
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">or</span>
+              <span className="bg-card px-2 text-muted-foreground">or</span>
             </div>
           </div>
+
           <div className="space-y-2">
-            <label className="text-sm font-medium">Enter Life Path Number</label>
+            <label className="text-sm font-medium text-muted-foreground">
+              Enter Life Path Number directly
+            </label>
             <Input
               type="number"
               placeholder="1-99"
@@ -98,11 +109,12 @@ export const NumerologyCalculator = ({ onCalculate }: NumerologyCalculatorProps)
             />
           </div>
         </div>
-        <div className="text-center pt-4 border-t">
-          <div className="text-sm text-muted-foreground">Your Life Path Number</div>
-          <div className={`text-2xl font-bold ${[11, 22, 33].includes(parseInt(displayedNumber)) ? "text-accent" : ""}`}>
+
+        <div className="pt-4 text-center space-y-2">
+          <p className="text-sm text-muted-foreground">Your Life Path Number</p>
+          <p className={`text-3xl font-bold ${[11, 22, 33].includes(parseInt(displayedNumber)) ? "text-accent" : ""}`}>
             {displayedNumber}
-          </div>
+          </p>
         </div>
       </CardContent>
     </Card>
