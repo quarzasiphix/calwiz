@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
@@ -31,55 +32,71 @@ export const CalendarDay = ({ day, isMobile, calendarType }: CalendarDayProps) =
       className={cn(
         "day-cell group hover:bg-muted/50 transition-colors duration-200",
         day.isToday && "today-cell",
-        "flex flex-col items-center justify-center p-2 md:p-3",
-        "w-full h-full cursor-pointer gap-1 md:gap-2"
+        "flex flex-col items-start justify-start p-2 md:p-3",
+        "w-full h-full cursor-pointer"
       )}
     >
       <div className={cn(
-        "day-number font-medium text-sm md:text-base",
+        "day-number font-medium text-sm md:text-base ml-1",
         day.isToday && "text-primary"
       )}>
         {day.date}
       </div>
       
-      {calendarType === "numerology" ? (
-        <div className="flex flex-col items-center space-y-0.5">
-          <div className="numerology-value text-muted-foreground group-hover:text-foreground transition-colors">
-            <span className={cn(
-              "master-number",
-              [11, 22, 33].includes(day.primaryNumber) && "text-accent font-semibold"
-            )}>
-              {day.primaryNumber}
-            </span>
+      <div className="mt-auto w-full">
+        {calendarType === "numerology" ? (
+          <div className="flex flex-col space-y-1.5 p-1">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">Daily:</span>
+              <span className={cn(
+                "text-sm font-medium",
+                [11, 22, 33].includes(day.primaryNumber) && "text-primary font-semibold"
+              )}>
+                {day.primaryNumber}
+              </span>
+            </div>
+            
+            {!isMobile && (
+              <>
+                {day.secondaryNumber && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">Reduced:</span>
+                    <span className="text-sm">{day.secondaryNumber}</span>
+                  </div>
+                )}
+                
+                {day.personalNumber && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">Personal:</span>
+                    <span className="text-sm text-primary/90">{day.personalNumber}</span>
+                  </div>
+                )}
+              </>
+            )}
           </div>
-          {!isMobile && day.secondaryNumber && (
-            <div className="hidden md:block text-xs text-muted-foreground group-hover:text-foreground">
-              ({day.secondaryNumber})
+        ) : (
+          <div className="flex flex-col space-y-1.5 p-1">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">Sign:</span>
+              <span className="text-sm font-medium">{day.zodiacSign}</span>
             </div>
-          )}
-          {!isMobile && day.personalNumber && (
-            <div className="hidden md:block text-xs text-primary/70 font-medium">
-              Personal: {day.personalNumber}
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="flex flex-col items-center space-y-0.5">
-          <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-            {day.zodiacSign?.substring(0, 3)}
-          </span>
-          {!isMobile && (
-            <>
-              <span className="hidden md:block text-xs text-muted-foreground/80">
-                {day.chineseSign}
-              </span>
-              <span className="hidden md:block text-xs text-primary/70">
-                {day.planetaryInfluence}
-              </span>
-            </>
-          )}
-        </div>
-      )}
+            
+            {!isMobile && (
+              <>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Chinese:</span>
+                  <span className="text-sm">{day.chineseSign}</span>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Planet:</span>
+                  <span className="text-sm text-primary/90">{day.planetaryInfluence}</span>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 
