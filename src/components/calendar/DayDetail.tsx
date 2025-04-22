@@ -17,12 +17,14 @@ interface DayData {
 interface DayDetailProps {
   day: DayData;
   calendarType: "numerology" | "astrology";
-  onClose?: () => void;
+  onClose?: (close: boolean) => void;
 }
 
 export const DayDetail = ({ day, calendarType, onClose }: DayDetailProps) => {
   const currentDate = new Date();
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+  const [showAiResponse, setShowAiResponse] = React.useState(false);
 
   return (
     <div className="space-y-4 py-2">
@@ -88,17 +90,27 @@ export const DayDetail = ({ day, calendarType, onClose }: DayDetailProps) => {
         </div>
       )}
 
+      {showAiResponse && (
+        <div className="mt-4 p-4 rounded-lg border bg-card/50 backdrop-blur-sm">
+          <h3 className="text-lg font-medium mb-2">AI Insights</h3>
+          <div className="bg-muted/50 p-3 rounded-lg">
+            <p className="text-muted-foreground text-sm">Loading AI response...</p>
+          </div>
+        </div>
+      )}
+
       <div className="mt-6 space-y-4">
         <Button 
           className="w-full"
           variant="outline"
+          onClick={() => setShowAiResponse(true)}
         >
           <MessageCircle className="mr-2" />
           Ask AI about this day
         </Button>
         
         {onClose && (
-          <Button onClick={onClose} variant="secondary" className="w-full">
+          <Button onClick={() => onClose(true)} variant="secondary" className="w-full">
             Close
           </Button>
         )}

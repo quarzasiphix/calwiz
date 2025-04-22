@@ -32,7 +32,8 @@ export const CalendarDay = ({ day, isMobile, calendarType }: CalendarDayProps) =
       className={cn(
         "day-cell group hover:bg-muted/50 transition-colors duration-200",
         day.isToday && "today-cell",
-        "flex flex-col items-center justify-center p-1 md:p-2"
+        "flex flex-col items-center justify-center p-1 md:p-2",
+        "w-full h-full"
       )}
     >
       <div className={cn(
@@ -66,7 +67,13 @@ export const CalendarDay = ({ day, isMobile, calendarType }: CalendarDayProps) =
         </DrawerTrigger>
         <DrawerContent>
           <div className="px-4 pb-6 pt-2">
-            <DayDetail day={day} calendarType={calendarType} />
+            <DayDetail day={day} calendarType={calendarType} onClose={close => {
+              // Find the close button in the drawer and click it
+              const closeButton = document.querySelector('[data-vaul-drawer-close]');
+              if (closeButton) {
+                (closeButton as HTMLElement).click();
+              }
+            }} />
           </div>
         </DrawerContent>
       </Drawer>
@@ -82,7 +89,13 @@ export const CalendarDay = ({ day, isMobile, calendarType }: CalendarDayProps) =
         <DialogHeader>
           <DialogTitle>Day Details</DialogTitle>
         </DialogHeader>
-        <DayDetail day={day} calendarType={calendarType} />
+        <DayDetail day={day} calendarType={calendarType} onClose={close => {
+          // Find the close button in the dialog and click it
+          const closeButton = document.querySelector('[data-radix-collection-item]');
+          if (closeButton) {
+            (closeButton as HTMLElement).click();
+          }
+        }} />
       </DialogContent>
     </Dialog>
   );
