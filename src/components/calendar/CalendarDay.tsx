@@ -1,6 +1,7 @@
+
 import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
 import { DayDetail } from "./DayDetail";
 
@@ -44,21 +45,13 @@ export const CalendarDay = ({ day, isMobile, calendarType }: CalendarDayProps) =
       
       {isMobile ? (
         <div className="mt-auto w-full">
-          {calendarType === "numerology" ? (
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-muted-foreground">Daily:</span>
-              <span className={cn(
-                "font-medium",
-                [11, 22, 33].includes(day.primaryNumber) && "text-primary font-semibold"
-              )}>
-                {day.primaryNumber}
-              </span>
-            </div>
-          ) : (
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-muted-foreground">Sign:</span>
-              <span className="font-medium">{day.zodiacSign}</span>
-            </div>
+          {/* Mobile view - Show just the date number with minimal additional info */}
+          {day.primaryNumber && calendarType === "numerology" && 
+            [11, 22, 33].includes(day.primaryNumber) && (
+              <div className="text-xs text-primary font-medium">{day.primaryNumber}</div>
+          )}
+          {day.zodiacSign && calendarType === "astrology" && (
+            <div className="text-xs truncate">{day.zodiacSign}</div>
           )}
         </div>
       ) : (
@@ -115,6 +108,9 @@ export const CalendarDay = ({ day, isMobile, calendarType }: CalendarDayProps) =
           {renderDayContent()}
         </DrawerTrigger>
         <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Day Details</DrawerTitle>
+          </DrawerHeader>
           <div className="px-4 pb-6 pt-2">
             <DayDetail day={day} calendarType={calendarType} onClose={close => {
               const closeButton = document.querySelector('[data-vaul-drawer-close]');
