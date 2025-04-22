@@ -27,13 +27,14 @@ export const CalendarDay = ({ day, isMobile, calendarType }: CalendarDayProps) =
     return <div className="day-cell empty" />;
   }
 
-  const DayContent = () => (
-    <button 
+  // Create separate component for day content to avoid ref forwarding issues
+  const dayContent = (
+    <div 
       className={cn(
         "day-cell group hover:bg-muted/50 transition-colors duration-200",
         day.isToday && "today-cell",
         "flex flex-col items-center justify-center p-1 md:p-2",
-        "w-full h-full"
+        "w-full h-full cursor-pointer"
       )}
     >
       <div className={cn(
@@ -56,14 +57,14 @@ export const CalendarDay = ({ day, isMobile, calendarType }: CalendarDayProps) =
           {day.zodiacSign?.substring(0, 3)}
         </span>
       )}
-    </button>
+    </div>
   );
 
   if (isMobile) {
     return (
       <Drawer>
         <DrawerTrigger asChild>
-          <DayContent />
+          {dayContent}
         </DrawerTrigger>
         <DrawerContent>
           <div className="px-4 pb-6 pt-2">
@@ -83,7 +84,7 @@ export const CalendarDay = ({ day, isMobile, calendarType }: CalendarDayProps) =
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <DayContent />
+        {dayContent}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
