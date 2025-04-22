@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
@@ -27,7 +26,7 @@ export const CalendarDay = ({ day, isMobile, calendarType }: CalendarDayProps) =
     return <div className="day-cell empty" />;
   }
 
-  const dayContent = (
+  const renderDayContent = () => (
     <div 
       className={cn(
         "day-cell group hover:bg-muted/50 transition-colors duration-200",
@@ -37,66 +36,75 @@ export const CalendarDay = ({ day, isMobile, calendarType }: CalendarDayProps) =
       )}
     >
       <div className={cn(
-        "day-number font-medium text-sm md:text-base ml-1",
+        "day-number font-medium",
         day.isToday && "text-primary"
       )}>
         {day.date}
       </div>
       
-      <div className="mt-auto w-full">
-        {calendarType === "numerology" ? (
-          <div className="flex flex-col space-y-1.5 p-1">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">Daily:</span>
+      {isMobile ? (
+        <div className="mt-auto w-full">
+          {calendarType === "numerology" ? (
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-muted-foreground">Daily:</span>
               <span className={cn(
-                "text-sm font-medium",
+                "font-medium",
                 [11, 22, 33].includes(day.primaryNumber) && "text-primary font-semibold"
               )}>
                 {day.primaryNumber}
               </span>
             </div>
-            
-            {!isMobile && (
-              <>
-                {day.secondaryNumber && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">Reduced:</span>
-                    <span className="text-sm">{day.secondaryNumber}</span>
-                  </div>
-                )}
-                
-                {day.personalNumber && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">Personal:</span>
-                    <span className="text-sm text-primary/90">{day.personalNumber}</span>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        ) : (
-          <div className="flex flex-col space-y-1.5 p-1">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">Sign:</span>
-              <span className="text-sm font-medium">{day.zodiacSign}</span>
+          ) : (
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-muted-foreground">Sign:</span>
+              <span className="font-medium">{day.zodiacSign}</span>
             </div>
-            
-            {!isMobile && (
-              <>
+          )}
+        </div>
+      ) : (
+        <div className="day-content">
+          {calendarType === "numerology" ? (
+            <div className="desktop-details space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Daily Number:</span>
+                <span className={cn(
+                  "font-medium",
+                  [11, 22, 33].includes(day.primaryNumber) && "text-primary font-semibold"
+                )}>
+                  {day.primaryNumber}
+                </span>
+              </div>
+              {day.secondaryNumber && (
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Chinese:</span>
-                  <span className="text-sm">{day.chineseSign}</span>
+                  <span className="text-muted-foreground">Reduced:</span>
+                  <span>{day.secondaryNumber}</span>
                 </div>
-                
+              )}
+              {day.personalNumber && (
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Planet:</span>
-                  <span className="text-sm text-primary/90">{day.planetaryInfluence}</span>
+                  <span className="text-muted-foreground">Personal:</span>
+                  <span className="text-primary/90">{day.personalNumber}</span>
                 </div>
-              </>
-            )}
-          </div>
-        )}
-      </div>
+              )}
+            </div>
+          ) : (
+            <div className="desktop-details space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Zodiac:</span>
+                <span className="font-medium">{day.zodiacSign}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Chinese:</span>
+                <span>{day.chineseSign}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Planet:</span>
+                <span className="text-primary/90">{day.planetaryInfluence}</span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 
@@ -104,7 +112,7 @@ export const CalendarDay = ({ day, isMobile, calendarType }: CalendarDayProps) =
     return (
       <Drawer>
         <DrawerTrigger asChild>
-          {dayContent}
+          {renderDayContent()}
         </DrawerTrigger>
         <DrawerContent>
           <div className="px-4 pb-6 pt-2">
@@ -123,7 +131,7 @@ export const CalendarDay = ({ day, isMobile, calendarType }: CalendarDayProps) =
   return (
     <Dialog>
       <DialogTrigger asChild>
-        {dayContent}
+        {renderDayContent()}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
