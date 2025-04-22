@@ -45,13 +45,21 @@ export const CalendarDay = ({ day, isMobile, calendarType }: CalendarDayProps) =
       
       {isMobile ? (
         <div className="mt-auto w-full">
-          {/* Mobile view - Show just the date number with minimal additional info */}
-          {day.primaryNumber && calendarType === "numerology" && 
-            [11, 22, 33].includes(day.primaryNumber) && (
-              <div className="text-xs text-primary font-medium">{day.primaryNumber}</div>
-          )}
-          {day.zodiacSign && calendarType === "astrology" && (
-            <div className="text-xs truncate">{day.zodiacSign}</div>
+          {/* Mobile view - Show simple but consistent info */}
+          {calendarType === "numerology" ? (
+            <div className="text-xs">
+              {day.primaryNumber && (
+                <span className={cn(
+                  [11, 22, 33].includes(day.primaryNumber) && "text-primary font-medium"
+                )}>
+                  {day.primaryNumber}
+                </span>
+              )}
+            </div>
+          ) : (
+            <div className="text-xs truncate">
+              {day.zodiacSign}
+            </div>
           )}
         </div>
       ) : (
