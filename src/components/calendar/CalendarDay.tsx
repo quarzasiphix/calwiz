@@ -28,10 +28,21 @@ export const CalendarDay = ({ day, isMobile, calendarType }: CalendarDayProps) =
   }
 
   const DayContent = () => (
-    <button className={cn("day-cell", day.isToday && "today-cell")}>
-      <div className="day-number">{day.date}</div>
+    <button 
+      className={cn(
+        "day-cell group hover:bg-muted/50 transition-colors duration-200",
+        day.isToday && "today-cell",
+        "flex flex-col items-center justify-center p-1 md:p-2"
+      )}
+    >
+      <div className={cn(
+        "day-number font-medium",
+        day.isToday && "text-primary"
+      )}>
+        {day.date}
+      </div>
       {calendarType === "numerology" ? (
-        <div className="numerology-value">
+        <div className="numerology-value text-muted-foreground group-hover:text-foreground transition-colors">
           <span className={cn(
             "master-number",
             [11, 22, 33].includes(day.primaryNumber) && "text-accent font-semibold"
@@ -40,7 +51,7 @@ export const CalendarDay = ({ day, isMobile, calendarType }: CalendarDayProps) =
           </span>
         </div>
       ) : (
-        <span className="text-muted-foreground text-xs">
+        <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
           {day.zodiacSign?.substring(0, 3)}
         </span>
       )}
@@ -67,7 +78,7 @@ export const CalendarDay = ({ day, isMobile, calendarType }: CalendarDayProps) =
       <DialogTrigger asChild>
         <DayContent />
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Day Details</DialogTitle>
         </DialogHeader>
