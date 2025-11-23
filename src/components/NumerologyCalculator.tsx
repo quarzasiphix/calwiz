@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,10 +11,29 @@ interface NumerologyCalculatorProps {
   compact?: boolean;
 }
 
+const BIRTHDATE_STORAGE_KEY = "calwiz_birthdate";
+const LIFE_PATH_STORAGE_KEY = "calwiz_life_path_number";
+
 export const NumerologyCalculator = ({ onCalculate, compact = false }: NumerologyCalculatorProps) => {
   const [birthdate, setBirthdate] = useState("");
   const [result, setResult] = useState<number | null>(null);
   const [error, setError] = useState("");
+
+  // Load saved birthdate and life path number on mount
+  useEffect(() => {
+    const savedBirthdate = localStorage.getItem(BIRTHDATE_STORAGE_KEY);
+    const savedLifePath = localStorage.getItem(LIFE_PATH_STORAGE_KEY);
+    
+    if (savedBirthdate) {
+      setBirthdate(savedBirthdate);
+    }
+    
+    if (savedLifePath) {
+      const lifePathNumber = parseInt(savedLifePath);
+      setResult(lifePathNumber);
+      onCalculate(lifePathNumber);
+    }
+  }, [onCalculate]);
 
   const masterNumbers = [11, 22, 33];
 
@@ -62,6 +81,10 @@ export const NumerologyCalculator = ({ onCalculate, compact = false }: Numerolog
     } else {
       lifePathNumber = reduceToSingleDigit(total);
     }
+    
+    // Save to localStorage
+    localStorage.setItem(BIRTHDATE_STORAGE_KEY, birthdate);
+    localStorage.setItem(LIFE_PATH_STORAGE_KEY, lifePathNumber.toString());
     
     setResult(lifePathNumber);
     onCalculate(lifePathNumber);
