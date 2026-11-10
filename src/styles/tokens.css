@@ -1,0 +1,63 @@
+/*
+ * Calwiz design tokens. Colours are space-separated RGB so Tailwind can apply
+ * alpha (`bg-surface/60`). Dark ("Night") is the primary theme; light ("Paper")
+ * is a full peer, not an afterthought.
+ *
+ * Keep --bg in sync with THEME_COLOR in vite.config.ts and index.html.
+ */
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: 11 13 23;          /* #0b0d17 night ink */
+  --surface: 18 21 35;     /* panels */
+  --raised: 27 31 50;      /* controls, hover */
+  --line: 46 51 76;        /* hairlines */
+  --ink: 236 232 222;      /* primary text: moonlit ivory */
+  --muted: 160 163 184;    /* secondary text (≥ 7:1 on bg) */
+  --faint: 104 108 135;    /* tertiary / decorative only */
+  --moon: 240 233 214;     /* lit lunar surface */
+  --moon-shadow: 22 25 40; /* unlit limb */
+  --gold: 214 181 120;     /* personal / highlight */
+  --sky: 142 162 232;      /* astronomical events */
+  --rose: 226 134 140;     /* eclipses, warnings */
+  --star-opacity: 0.55;
+  --mark: 240 233 214;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: 246 242 233;
+  --surface: 252 250 245;
+  --raised: 236 231 219;
+  --line: 214 207 192;
+  --ink: 26 27 38;
+  --muted: 82 84 104;
+  --faint: 140 140 155;
+  --moon: 250 246 234;
+  --moon-shadow: 70 73 92;
+  --gold: 150 110 40;
+  --sky: 58 82 170;
+  --rose: 176 64 72;
+  --star-opacity: 0;
+  --mark: 26 27 38;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    color-scheme: light;
+    --bg: 246 242 233;
+    --surface: 252 250 245;
+    --raised: 236 231 219;
+    --line: 214 207 192;
+    --ink: 26 27 38;
+    --muted: 82 84 104;
+    --faint: 140 140 155;
+    --moon: 250 246 234;
+    --moon-shadow: 70 73 92;
+    --gold: 150 110 40;
+    --sky: 58 82 170;
+    --rose: 176 64 72;
+    --star-opacity: 0;
+  --mark: 26 27 38;
+  }
+}

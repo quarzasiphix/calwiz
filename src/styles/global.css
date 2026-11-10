@@ -1,0 +1,102 @@
+@import "@fontsource-variable/inter/wght.css";
+@import "@fontsource-variable/fraunces/full.css";
+@import "./tokens.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    background: rgb(var(--bg));
+  }
+  body {
+    @apply bg-bg font-sans text-ink antialiased;
+    font-feature-settings: "cv11", "ss01";
+    min-height: 100dvh;
+    overscroll-behavior-y: none;
+  }
+  /* Sparse, static starfield. Decorative; hidden in light theme and for print. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: var(--star-opacity);
+    background-image:
+      radial-gradient(1px 1px at 12% 18%, rgb(255 255 255 / 0.7), transparent 60%),
+      radial-gradient(1px 1px at 72% 12%, rgb(255 255 255 / 0.5), transparent 60%),
+      radial-gradient(1.5px 1.5px at 38% 64%, rgb(255 255 255 / 0.45), transparent 60%),
+      radial-gradient(1px 1px at 88% 48%, rgb(255 255 255 / 0.6), transparent 60%),
+      radial-gradient(1px 1px at 22% 82%, rgb(255 255 255 / 0.4), transparent 60%),
+      radial-gradient(1px 1px at 56% 32%, rgb(255 255 255 / 0.35), transparent 60%),
+      radial-gradient(1px 1px at 94% 86%, rgb(255 255 255 / 0.5), transparent 60%),
+      radial-gradient(1px 1px at 4% 46%, rgb(255 255 255 / 0.4), transparent 60%),
+      radial-gradient(120% 80% at 50% -10%, rgb(60 70 130 / 0.22), transparent 60%);
+    background-size: 520px 520px, 610px 610px, 700px 700px, 450px 450px, 580px 580px, 390px 390px, 660px 660px, 500px 500px, 100% 100%;
+  }
+  :focus-visible {
+    outline: 2px solid rgb(var(--gold));
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  ::selection {
+    background: rgb(var(--gold) / 0.35);
+  }
+  h1, h2, h3 {
+    @apply font-display;
+    font-variation-settings: "SOFT" 50, "WONK" 0;
+    letter-spacing: -0.01em;
+  }
+}
+
+@layer components {
+  .num { font-variant-numeric: tabular-nums; }
+  .label { @apply text-2xs font-medium uppercase tracking-[0.14em] text-muted; }
+  .panel { @apply rounded-2xl border border-line/70 bg-surface/80; }
+  .hairline { @apply border-line/70; }
+  .btn {
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-4 text-sm font-medium transition-colors duration-150;
+  }
+  .btn-ghost { @apply btn text-ink hover:bg-raised; }
+  .btn-outline { @apply btn border border-line text-ink hover:bg-raised; }
+  .btn-solid { @apply btn bg-ink text-bg hover:bg-ink/90; }
+  .icon-btn { @apply inline-flex h-11 w-11 items-center justify-center rounded-full text-ink transition-colors hover:bg-raised; }
+  .chip {
+    @apply inline-flex min-h-[32px] items-center gap-1.5 rounded-full border border-line px-3 text-xs font-medium text-muted transition-colors;
+  }
+  .chip[aria-pressed="true"], .chip[aria-selected="true"], .chip[aria-current="page"] {
+    @apply border-ink/60 bg-ink/10 text-ink;
+  }
+  .field {
+    @apply min-h-[44px] w-full rounded-xl border border-line bg-bg/60 px-3 text-base text-ink placeholder:text-faint focus:border-gold focus:outline-none;
+  }
+  .link { @apply underline decoration-line underline-offset-4 hover:decoration-ink; }
+}
+
+@layer utilities {
+  .pt-safe { padding-top: env(safe-area-inset-top); }
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+  .pl-safe { padding-left: env(safe-area-inset-left); }
+  .pr-safe { padding-right: env(safe-area-inset-right); }
+  .scrollbar-none { scrollbar-width: none; }
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+.animate-rise { animation: rise-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }

@@ -1,73 +1,44 @@
-# Welcome to your Lovable project
+# Calwiz
 
-## Project info
+A mobile-first, installable cosmic calendar. For any date it shows what is
+happening in the sky (the Moon's real phase and illumination, planetary
+positions, retrogrades, eclipses), the numbers of the day, and how they relate
+to your own birth date. Astrology and numerology are presented as symbolic
+traditions and always labelled apart from computed data.
 
-**URL**: https://lovable.dev/projects/e7b5f3f9-6972-4a0d-9f9c-a3588cf22f38
+- **Accurate:** astronomy from [astronomy-engine](https://github.com/cosinekitty/astronomy) (≈1′), tested against USNO and NASA reference values.
+- **Private:** no account, no backend, no analytics. The profile stays in `localStorage`.
+- **Offline:** a PWA with a precached shell. Every calculation runs on the device.
 
-## How can I edit this code?
+## Screens
 
-There are several ways of editing your application.
+| Route | Purpose |
+|---|---|
+| `/` | Today: the Moon now, Sun/Moon signs, retrogrades, numbers, reading, upcoming events |
+| `/calendar/:yyyy-mm?d=` | Month grid or list with Moon, Numbers, Events and Personal layers |
+| `/day/:yyyy-mm-dd` | Deep-linkable day: share, `.ics` export, optional AI |
+| `/moon?d=` | Lunation explorer, milestones, rise/set, eclipses, calendar reminders |
+| `/sky?d=` · `/sky/natal` | Zodiac wheel, positions, aspects, ingresses/stations · birth chart and transits |
+| `/numbers?d=` | Universal and personal numbers with the working shown, nine-year cycle |
+| `/me` · `/about` | Profile, location, conventions, theme, install, export/delete · methods and limits |
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/e7b5f3f9-6972-4a0d-9f9c-a3588cf22f38) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+## Develop
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+npm install
+npm run dev          # http://localhost:8080
+npm run check        # typecheck + lint + unit tests + build
+npm run test:e2e     # Playwright against the production build (mobile + desktop, offline)
+npm run icons        # regenerate PWA icons from scripts/generate-icons.mjs
+node scripts/screenshot.mjs http://localhost:8080/moon out.png 390 844 1 dark
 ```
 
-**Edit a file directly in GitHub**
+Optional AI: copy `.env.example` to `.env.local` and set `VITE_AI_WEBHOOK_URL`. See `docs/AI.md`.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Docs
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/e7b5f3f9-6972-4a0d-9f9c-a3588cf22f38) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- `AGENTS.md`: where everything lives, and the rules for changing it (start here, human or AI)
+- `docs/ARCHITECTURE.md`: decisions and trade-offs
+- `docs/CALCULATIONS.md`: every method, convention and precision limit
+- `docs/AI.md`: the AI webhook contract
+- `docs/AUDIT.md`: what was wrong with the previous version
